@@ -13,9 +13,11 @@ vim.opt.rtp:prepend(plugin_dir)
 local plenary_path = "/tmp/nvim/site/pack/testing/start/plenary.nvim"
 if vim.fn.isdirectory(plenary_path) == 0 then
   vim.fn.system({
-    "git", "clone", "--depth=1",
+    "git",
+    "clone",
+    "--depth=1",
     "https://github.com/nvim-lua/plenary.nvim.git",
-    plenary_path
+    plenary_path,
   })
 end
 

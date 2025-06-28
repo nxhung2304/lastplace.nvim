@@ -11,11 +11,15 @@ describe("lastplace.utils", function()
   describe("is_at_beginning", function()
     it("should return true when at position 1:1", function()
       vim.fn.line = function(mark)
-        if mark == "." then return 1 end
+        if mark == "." then
+          return 1
+        end
         return 1
       end
       vim.fn.col = function(mark)
-        if mark == "." then return 1 end
+        if mark == "." then
+          return 1
+        end
         return 1
       end
 
@@ -24,7 +28,9 @@ describe("lastplace.utils", function()
 
     it("should return false when not at beginning", function()
       vim.fn.line = function(mark)
-        if mark == "." then return 5 end
+        if mark == "." then
+          return 5
+        end
         return 1
       end
 
@@ -36,7 +42,7 @@ describe("lastplace.utils", function()
     it("should return comprehensive file statistics", function()
       spec_helper.setup_test_file({
         filetype = "lua",
-        total_lines = 100
+        total_lines = 100,
       })
 
       local stats = utils.get_file_stats()

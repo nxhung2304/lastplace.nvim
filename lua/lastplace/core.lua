@@ -53,10 +53,17 @@ function M.jump_to_last_place()
   local buftype = vim.bo.buftype
   local bufname = vim.fn.expand("%")
 
-  debug_log(string.format(
-    "Buffer: %s, FileType: %s, BufType: %s, LastPos: %d:%d, Total: %d",
-    bufname, filetype, buftype, last_line, last_col, total_lines
-  ))
+  debug_log(
+    string.format(
+      "Buffer: %s, FileType: %s, BufType: %s, LastPos: %d:%d, Total: %d",
+      bufname,
+      filetype,
+      buftype,
+      last_line,
+      last_col,
+      total_lines
+    )
+  )
 
   if should_ignore_filetype(filetype) then
     debug_log("Ignoring due to filetype: " .. filetype)

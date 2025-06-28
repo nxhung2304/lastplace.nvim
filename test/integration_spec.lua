@@ -14,7 +14,7 @@ describe("lastplace integration", function()
       lastplace.setup({
         center_on_jump = true,
         min_lines = 5,
-        ignore_filetypes = { "test" }
+        ignore_filetypes = { "test" },
       })
 
       -- Test ignored file
@@ -25,7 +25,7 @@ describe("lastplace integration", function()
       spec_helper.setup_test_file({
         filetype = "lua",
         total_lines = 100,
-        last_line = 50
+        last_line = 50,
       })
       assert.is_false(lastplace.is_ignored())
 

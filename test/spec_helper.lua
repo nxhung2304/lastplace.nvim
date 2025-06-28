@@ -9,29 +9,47 @@ function M.setup_vim_mocks()
   -- Mock vim.fn functions
   vim.fn = vim.fn or {}
   vim.fn.line = function(mark)
-    if mark == "." then return 1 end
-    if mark == "$" then return 100 end
-    if mark == "'\"" then return 50 end
-    if mark == "w0" then return 1 end
-    if mark == "w$" then return 20 end
+    if mark == "." then
+      return 1
+    end
+    if mark == "$" then
+      return 100
+    end
+    if mark == "'\"" then
+      return 50
+    end
+    if mark == "w0" then
+      return 1
+    end
+    if mark == "w$" then
+      return 20
+    end
     return 1
   end
 
   vim.fn.col = function(mark)
-    if mark == "." then return 1 end
-    if mark == "'\"" then return 10 end
+    if mark == "." then
+      return 1
+    end
+    if mark == "'\"" then
+      return 10
+    end
     return 1
   end
 
   vim.fn.expand = function(pattern)
-    if pattern == "%" then return "test.lua" end
+    if pattern == "%" then
+      return "test.lua"
+    end
     return "test"
   end
 
   -- Mock vim.api
   vim.api = vim.api or {}
   vim.api.nvim_win_set_cursor = function(win, pos) end
-  vim.api.nvim_create_augroup = function() return 1 end
+  vim.api.nvim_create_augroup = function()
+    return 1
+  end
   vim.api.nvim_create_autocmd = function() end
   vim.api.nvim_create_user_command = function() end
 
@@ -70,9 +88,15 @@ function M.setup_test_file(opts)
 
   if opts.total_lines then
     vim.fn.line = function(mark)
-      if mark == "$" then return opts.total_lines end
-      if mark == "." then return opts.current_line or 1 end
-      if mark == "'\"" then return opts.last_line or 1 end
+      if mark == "$" then
+        return opts.total_lines
+      end
+      if mark == "." then
+        return opts.current_line or 1
+      end
+      if mark == "'\"" then
+        return opts.last_line or 1
+      end
       return 1
     end
   end

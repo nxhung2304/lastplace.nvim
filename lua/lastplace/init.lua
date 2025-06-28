@@ -1,8 +1,8 @@
 local M = {}
 
+local commands = require("lastplace.commands")
 local config = require("lastplace.config")
 local core = require("lastplace.core")
-local commands = require("lastplace.commands")
 
 function M.setup(user_config)
   config.setup(user_config)

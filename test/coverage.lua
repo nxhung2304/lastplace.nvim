@@ -8,7 +8,7 @@ function M.track_function(module, func_name)
 end
 
 function M.run()
-  local plenary = require('plenary.test_harness')
+  local plenary = require("plenary.test_harness")
 
   local original_require = require
   _G.require = function(name)
@@ -57,8 +57,14 @@ function M.generate_report()
   end
 
   local coverage_percent = total_functions > 0 and (covered_functions / total_functions * 100) or 0
-  print(string.format("\nTotal Coverage: %.1f%% (%d/%d functions)",
-    coverage_percent, covered_functions, total_functions))
+  print(
+    string.format(
+      "\nTotal Coverage: %.1f%% (%d/%d functions)",
+      coverage_percent,
+      covered_functions,
+      total_functions
+    )
+  )
 end
 
 return M

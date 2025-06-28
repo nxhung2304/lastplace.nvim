@@ -1,7 +1,7 @@
 local M = {}
 
-local core = require("lastplace.core")
 local config = require("lastplace.config")
+local core = require("lastplace.core")
 
 function M.setup()
   vim.api.nvim_create_user_command("LastPlaceJump", function()
@@ -12,7 +12,7 @@ function M.setup()
       vim.notify("Could not jump to last position", vim.log.levels.WARN)
     end
   end, {
-    desc = "Manually jump to last cursor position"
+    desc = "Manually jump to last cursor position",
   })
 
   vim.api.nvim_create_user_command("LastPlaceToggle", function()
@@ -20,7 +20,7 @@ function M.setup()
     cfg.center_on_jump = not cfg.center_on_jump
     vim.notify("LastPlace centering: " .. (cfg.center_on_jump and "enabled" or "disabled"))
   end, {
-    desc = "Toggle centering after jump"
+    desc = "Toggle centering after jump",
   })
 
   vim.api.nvim_create_user_command("LastPlaceInfo", function()
@@ -38,14 +38,14 @@ function M.setup()
 
     vim.notify(table.concat(info, "\n"), vim.log.levels.INFO)
   end, {
-    desc = "Show LastPlace plugin information"
+    desc = "Show LastPlace plugin information",
   })
 
   vim.api.nvim_create_user_command("LastPlaceReset", function()
     config.setup(config.get_default())
     vim.notify("LastPlace configuration reset to defaults")
   end, {
-    desc = "Reset LastPlace configuration to defaults"
+    desc = "Reset LastPlace configuration to defaults",
   })
 end
 

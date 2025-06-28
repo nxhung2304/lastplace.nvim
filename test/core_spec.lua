@@ -1,8 +1,8 @@
 local spec_helper = require("test.spec_helper")
 spec_helper.setup_vim_mocks()
 
-local core = require("lastplace.core")
 local config = require("lastplace.config")
+local core = require("lastplace.core")
 
 describe("lastplace.core", function()
   before_each(function()
@@ -29,7 +29,7 @@ describe("lastplace.core", function()
     it("should respect custom ignore lists", function()
       config.setup({
         ignore_filetypes = { "dart" },
-        ignore_buftypes = { "custom" }
+        ignore_buftypes = { "custom" },
       })
 
       spec_helper.setup_test_file({ filetype = "dart" })
@@ -52,7 +52,7 @@ describe("lastplace.core", function()
       spec_helper.setup_test_file({
         filetype = "lua",
         total_lines = 10,
-        last_line = 5
+        last_line = 5,
       })
 
       local result = core.jump_to_last_place()
@@ -63,7 +63,7 @@ describe("lastplace.core", function()
       spec_helper.setup_test_file({
         filetype = "lua",
         total_lines = 100,
-        last_line = 0 -- Invalid position
+        last_line = 0, -- Invalid position
       })
 
       local result = core.jump_to_last_place()
@@ -75,7 +75,7 @@ describe("lastplace.core", function()
       spec_helper.setup_test_file({
         filetype = "lua",
         total_lines = 100,
-        last_line = 75 -- Exceeds max_line
+        last_line = 75, -- Exceeds max_line
       })
 
       local result = core.jump_to_last_place()
@@ -86,7 +86,7 @@ describe("lastplace.core", function()
       spec_helper.setup_test_file({
         filetype = "lua",
         total_lines = 100,
-        last_line = 50
+        last_line = 50,
       })
 
       local jump_called = false
@@ -104,7 +104,7 @@ describe("lastplace.core", function()
       spec_helper.setup_test_file({
         filetype = "lua",
         total_lines = 100,
-        last_line = 50
+        last_line = 50,
       })
 
       local center_called = false
@@ -123,7 +123,7 @@ describe("lastplace.core", function()
       spec_helper.setup_test_file({
         filetype = "lua",
         total_lines = 100,
-        last_line = 50
+        last_line = 50,
       })
 
       local fold_opened = false
