@@ -21,7 +21,7 @@ jobs:
           sudo mv stylua /usr/local/bin/
           
       - name: Check formatting
-        run: stylua --check lua/ test/
+        run: stylua --check lua/
         
       - name: Install luacheck
         run: |

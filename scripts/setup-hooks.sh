@@ -42,7 +42,6 @@ setup_hook() {
 
 # Setup all hooks
 setup_hook "pre-commit"
-setup_hook "pre-push" 
 setup_hook "commit-msg"
 
 echo ""

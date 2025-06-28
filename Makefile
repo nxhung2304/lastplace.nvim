@@ -39,7 +39,7 @@ lint: ## Run linting with luacheck
 format: ## Format code with stylua
 	@echo "$(GREEN)[INFO]$(RESET) Formatting code with stylua..."
 	@if command -v stylua >/dev/null 2>&1; then \
-		stylua $(LUA_DIR)/ $(TEST_DIR)/; \
+		cd $(shell pwd) && stylua lua/; \
 		echo "$(GREEN)[SUCCESS]$(RESET) Code formatted!"; \
 	else \
 		echo "$(YELLOW)[WARN]$(RESET) stylua not found."; \
@@ -197,7 +197,7 @@ hooks-test: ## Test git hooks manually
 
 hooks-remove: ## Remove git hooks
 	@echo "$(GREEN)[INFO]$(RESET) Removing git hooks..."
-	@rm -f .git/hooks/pre-commit .git/hooks/pre-push .git/hooks/commit-msg
+	@rm -f .git/hooks/pre-commit .git/hooks/commit-msg
 	@echo "$(GREEN)[SUCCESS]$(RESET) Git hooks removed!"
 
 help: ## Show this help message
