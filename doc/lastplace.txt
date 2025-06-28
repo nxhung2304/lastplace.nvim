@@ -1,35 +1,450 @@
 *lastplace.txt*          Jump to last cursor position           *lastplace*
 
-INTRODUCTION                                    *lastplace-introduction*
+                    LASTPLACE.NVIM DOCUMENTATION
 
-LastPlace automatically restores cursor position when reopening files.
+Author: Your Name <your.email@example.com>
+License: MIT
+Version: 1.0.0
 
-SETUP                                          *lastplace-setup*
+==============================================================================
+CONTENTS                                                 *lastplace-contents*
 
-Basic setup: >
+1. Introduction .................................. |lastplace-introduction|
+2. Installation .................................. |lastplace-installation|
+3. Configuration ................................. |lastplace-configuration|
+4. Commands ...................................... |lastplace-commands|
+5. API ........................................... |lastplace-api|
+6. Examples ...................................... |lastplace-examples|
+7. Troubleshooting ............................... |lastplace-troubleshooting|
+8. Contributing .................................. |lastplace-contributing|
+9. Changelog ..................................... |lastplace-changelog|
+
+==============================================================================
+1. INTRODUCTION                                      *lastplace-introduction*
+
+LastPlace.nvim automatically restores your cursor position when reopening 
+files in Neovim. It's a smart implementation that:
+
+• Respects file types that shouldn't restore position (git commits, help files)
+• Handles edge cases gracefully (empty files, invalid positions)
+• Provides extensive configuration options
+• Includes debugging capabilities
+• Offers manual control through commands
+
+Key Features:~
+• Smart filetype and buffer type detection
+• Configurable minimum file size requirements  
+• Optional cursor centering after jump
+• Fold opening support
+• Comprehensive user commands
+• Full test coverage
+• Detailed logging for troubleshooting
+
+==============================================================================
+2. INSTALLATION                                      *lastplace-installation*
+
+Requirements:~
+• Neovim >= 0.7.0
+• No external dependencies
+
+Using lazy.nvim:~
+>lua
+    {
+      "nxhung2304/lastplace.nvim",
+      event = "BufReadPost",
+      config = function()
+        require("lastplace").setup()
+      end,
+    }
+<
+
+Using packer.nvim:~
+>lua
+    use {
+      "nxhung2304/lastplace.nvim",
+      config = function()
+        require("lastplace").setup()
+      end,
+    }
+<
+
+Using vim-plug:~
+>vim
+    Plug 'nxhung2304/lastplace.nvim'
+<
+Then in your init.lua: >lua
     require("lastplace").setup()
 <
 
-With custom options: >
+Manual installation:~
+1. Clone the repository to your Neovim configuration directory
+2. Add the plugin to your runtime path
+3. Call the setup function in your configuration
+
+==============================================================================
+3. CONFIGURATION                                    *lastplace-configuration*
+
+Default Configuration:~
+>lua
     require("lastplace").setup({
-      ignore_filetypes = { "gitcommit", "gitrebase" },
+      -- Filetypes to ignore (don't restore position)
+      ignore_filetypes = {
+        "gitcommit",
+        "gitrebase", 
+        "svn",
+        "hgcommit",
+        "xxd",
+        "COMMIT_EDITMSG",
+      },
+      
+      -- Buffer types to ignore
+      ignore_buftypes = {
+        "quickfix",
+        "nofile",
+        "help",
+        "terminal",
+      },
+      
+      -- Center the cursor line after jumping
       center_on_jump = true,
-      min_lines = 5,
+      
+      -- Only jump if the target line is not visible
+      jump_only_if_not_visible = false,
+      
+      -- Minimum number of lines in file to enable jumping
+      min_lines = 10,
+      
+      -- Maximum line number to jump to (0 = no limit)
+      max_line = 0,
+      
+      -- Open folds after jumping
+      open_folds = true,
+      
+      -- Enable debug messages
+      debug = false,
     })
 <
 
-CONFIGURATION                                  *lastplace-configuration*
+Configuration Options:~
 
-ignore_filetypes        List of filetypes to ignore
-ignore_buftypes         List of buffer types to ignore  
-center_on_jump          Center cursor after jumping (default: true)
-jump_only_if_not_visible Only jump if line not visible (default: false)
-min_lines               Minimum lines required (default: 10)
-max_line                Maximum line to jump to (default: 0 = no limit)
-open_folds              Open folds after jump (default: true)
-debug                   Enable debug messages (default: false)
+*lastplace-ignore_filetypes*
+Type: table (list of strings)
+Default: {"gitcommit", "gitrebase", "svn", "hgcommit", "xxd", "COMMIT_EDITMSG"}
 
-COMMANDS                                       *lastplace-commands*
+List of filetypes where cursor position should not be restored. Common use 
+cases include version control commit messages and binary files.
 
-:LastPlaceJump          Manually jump to last position
-:LastPlaceToggle        Toggle centering feature
+*lastplace-ignore_buftypes*  
+Type: table (list of strings)
+Default: {"quickfix", "nofile", "help", "terminal"}
+
+List of buffer types to ignore. These are special Neovim buffer types that
+typically shouldn't have cursor position restored.
+
+*lastplace-center_on_jump*
+Type: boolean
+Default: true
+
+Whether to center the cursor line in the window after jumping to the last
+position. Equivalent to running `zz` after the jump.
+
+*lastplace-jump_only_if_not_visible*
+Type: boolean  
+Default: false
+
+If true, only jump if the target line is not currently visible in the window.
+This prevents unnecessary jumps when the last position is already on screen.
+
+*lastplace-min_lines*
+Type: number
+Default: 10
+
+Minimum number of lines required in a file before position restoration is
+enabled. Prevents jumping in very short files where it's not useful.
+
+*lastplace-max_line*
+Type: number
+Default: 0 (no limit)
+
+Maximum line number to jump to. If the last position is beyond this line,
+the jump will not occur. Set to 0 to disable this limit.
+
+*lastplace-open_folds*
+Type: boolean
+Default: true
+
+Whether to open folds after jumping to ensure the cursor position is visible.
+Equivalent to running `zv` after the jump.
+
+*lastplace-debug*
+Type: boolean
+Default: false
+
+Enable debug logging to help troubleshoot issues. Debug messages are sent
+to `vim.notify()` with DEBUG level.
+
+==============================================================================
+4. COMMANDS                                            *lastplace-commands*
+
+LastPlace provides several user commands for manual control:
+
+                                                        *:LastPlaceJump*
+:LastPlaceJump          Manually jump to the last cursor position in the
+                        current buffer. Shows a notification with the result.
+
+                                                        *:LastPlaceToggle*
+:LastPlaceToggle        Toggle the `center_on_jump` setting. Useful for
+                        temporarily disabling cursor centering.
+
+                                                        *:LastPlaceInfo*
+:LastPlaceInfo          Display current plugin status and configuration.
+                        Shows whether the current buffer would be ignored,
+                        current settings, and other diagnostic information.
+
+                                                        *:LastPlaceReset*
+:LastPlaceReset         Reset all configuration options to their default
+                        values. Useful for troubleshooting configuration
+                        issues.
+
+==============================================================================
+5. API                                                      *lastplace-api*
+
+LastPlace exposes a Lua API for advanced usage and integration:
+
+                                                        *lastplace.setup()*
+lastplace.setup({config})
+    Initialize the plugin with optional configuration. See 
+    |lastplace-configuration| for available options.
+    
+    Parameters:~
+      {config} (table, optional): Configuration options
+
+                                                        *lastplace.jump()*
+lastplace.jump()
+    Manually jump to the last cursor position in the current buffer.
+    
+    Returns:~
+      boolean: true if jump was successful, false otherwise
+
+                                                        *lastplace.is_ignored()*
+lastplace.is_ignored()
+    Check if the current buffer should be ignored based on its filetype
+    and buffer type.
+    
+    Returns:~
+      boolean: true if buffer should be ignored, false otherwise
+
+                                                        *lastplace.config()*
+lastplace.config()
+    Get the current plugin configuration.
+    
+    Returns:~
+      table: Current configuration options
+
+Usage Examples:~
+>lua
+    local lastplace = require("lastplace")
+    
+    -- Basic setup
+    lastplace.setup()
+    
+    -- Custom setup
+    lastplace.setup({
+      center_on_jump = false,
+      ignore_filetypes = {"dart", "kotlin"},
+    })
+    
+    -- Manual jump
+    if not lastplace.is_ignored() then
+      lastplace.jump()
+    end
+    
+    -- Get current config
+    local config = lastplace.config()
+    print("Center on jump:", config.center_on_jump)
+<
+
+==============================================================================
+6. EXAMPLES                                            *lastplace-examples*
+
+Basic Usage:~
+>lua
+    -- Minimal setup with defaults
+    require("lastplace").setup()
+<
+
+Flutter/Dart Development:~
+>lua
+    require("lastplace").setup({
+      ignore_filetypes = {
+        "gitcommit",
+        "gitrebase",
+        -- Ignore generated Dart files
+        "dart", -- if you want to ignore all Dart files
+      },
+      center_on_jump = true,
+      min_lines = 5, -- Jump in smaller files
+    })
+<
+
+Conservative Setup (minimal jumping):~
+>lua
+    require("lastplace").setup({
+      jump_only_if_not_visible = true,
+      min_lines = 25,
+      max_line = 1000,
+      center_on_jump = false,
+    })
+<
+
+Debug Mode:~
+>lua
+    require("lastplace").setup({
+      debug = true,
+      -- ... other options
+    })
+    
+    -- Watch debug messages in :messages
+<
+
+Integration with Other Plugins:~
+>lua
+    -- With nvim-tree auto-close
+    local lastplace = require("lastplace")
+    
+    lastplace.setup({
+      ignore_buftypes = {
+        "quickfix", "nofile", "help", "terminal",
+        "NvimTree", -- Ignore nvim-tree
+      },
+    })
+<
+
+Conditional Setup:~
+>lua
+    -- Only enable for specific file patterns
+    vim.api.nvim_create_autocmd("BufReadPost", {
+      pattern = {"*.lua", "*.py", "*.js"},
+      callback = function()
+        local lastplace = require("lastplace")
+        if not lastplace.is_ignored() then
+          lastplace.jump()
+        end
+      end,
+    })
+<
+
+==============================================================================
+7. TROUBLESHOOTING                               *lastplace-troubleshooting*
+
+Common Issues:~
+
+Plugin not working at all:~
+1. Ensure you've called `require("lastplace").setup()`
+2. Check that the plugin is properly installed
+3. Enable debug mode: `setup({ debug = true })`
+4. Check `:messages` for error messages
+
+Position not restored for specific files:~
+1. Check if the filetype is in `ignore_filetypes`
+2. Check if the buffer type is in `ignore_buftypes`  
+3. Verify the file has enough lines (see `min_lines`)
+4. Use `:LastPlaceInfo` to see current status
+
+Cursor not centering:~
+1. Check `center_on_jump` setting
+2. Use `:LastPlaceToggle` to enable centering
+3. Verify the file is long enough for centering to be visible
+
+Debug Commands:~
+>vim
+    :LastPlaceInfo         " Check current status
+    :set filetype?         " Check current filetype
+    :set buftype?          " Check current buffer type
+    :echo line("'\"")      " Check last position mark
+    :messages              " View debug messages (if debug=true)
+<
+
+Performance Issues:~
+If you experience slow file opening:
+1. Disable `open_folds` if you don't use folding
+2. Set `jump_only_if_not_visible = true` to reduce unnecessary jumps
+3. Increase `min_lines` to skip very small files
+
+Conflicts with Other Plugins:~
+If LastPlace conflicts with other cursor positioning plugins:
+1. Ensure LastPlace loads after other plugins
+2. Consider disabling other cursor restoration features
+3. Use the API to conditionally enable LastPlace
+
+Getting Help:~
+1. Enable debug mode and check the logs
+2. Try with minimal configuration
+3. Check the issue tracker on GitHub
+4. Provide reproduction steps and debug output
+
+==============================================================================
+8. CONTRIBUTING                                      *lastplace-contributing*
+
+LastPlace.nvim welcomes contributions! Here's how to get started:
+
+Development Setup:~
+1. Fork the repository
+2. Clone your fork locally
+3. Install development dependencies
+4. Run the test suite
+
+Testing:~
+>bash
+    # Run all tests
+    make test
+    
+    # Run specific test file
+    nvim --headless -c "PlenaryBustedFile test/core_spec.lua"
+    
+    # Test coverage
+    make test-coverage
+<
+
+Code Style:~
+• Follow Lua formatting conventions
+• Use descriptive variable and function names  
+• Add comments for complex logic
+• Write tests for new features
+• Update documentation for API changes
+
+Submitting Changes:~
+1. Create a feature branch
+2. Write tests for your changes
+3. Ensure all tests pass
+4. Update documentation if needed
+5. Submit a pull request
+
+Areas for Contribution:~
+• Additional configuration options
+• Performance improvements
+• Better error handling
+• Extended API functionality
+• Documentation improvements
+• Test coverage expansion
+
+==============================================================================
+9. CHANGELOG                                          *lastplace-changelog*
+
+Version 1.0.0 (Initial Release):~
+• Core cursor position restoration functionality
+• Configurable filetype and buffer type filtering
+• Optional cursor centering and fold opening
+• Comprehensive user commands
+• Full Lua API
+• Complete test coverage
+• Detailed documentation
+
+Future Versions:~
+• Session integration
+• Advanced filtering options
+• Performance optimizations
+• Additional positioning strategies
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
