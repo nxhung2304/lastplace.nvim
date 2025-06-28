@@ -13,7 +13,6 @@
 - 🎯 **Precise Positioning** - Optional cursor centering and fold opening
 - 🔧 **Manual Control** - Commands for manual jumping and configuration
 - 🚀 **Zero Dependencies** - Pure Lua implementation with no external requirements
-- 🧪 **Fully Tested** - Comprehensive test suite with 95%+ coverage
 - 📚 **Well Documented** - Detailed help documentation and examples
 
 ## 📦 Installation
@@ -166,36 +165,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 })
 ```
 
-## 🧪 Testing
-
-### Run Tests
-
-```bash
-# Run all tests
-make test
-
-# Run specific test file
-make test-file FILE=test/core_spec.lua
-
-# Run tests with coverage
-make test-coverage
-
-# Watch mode (requires inotify-tools)
-make test-watch
-```
-
-### Test Structure
-
-```
-test/
-├── spec_helper.lua       # Test utilities and mocks
-├── config_spec.lua       # Configuration tests
-├── core_spec.lua         # Core functionality tests  
-├── commands_spec.lua     # User commands tests
-├── integration_spec.lua  # End-to-end tests
-└── utils_spec.lua        # Utility functions tests
-```
-
 ## 🐛 Troubleshooting
 
 ### Plugin Not Working
@@ -236,9 +205,6 @@ cd lastplace.nvim
 # Install development dependencies
 make install
 
-# Run tests
-make test
-
 # Start development environment
 make dev
 ```
@@ -247,7 +213,6 @@ make dev
 
 - Follow [stylua](https://github.com/JohnnyMorganz/StyLua) formatting
 - Use [luacheck](https://github.com/mpeterv/luacheck) for linting
-- Write tests for new features
 - Update documentation for API changes
 
 ### Submitting Changes
@@ -255,10 +220,9 @@ make dev
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
-4. Run tests (`make test`)
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+4. Commit your changes (`git commit -m 'Add amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
 
 ## 📄 License
 
@@ -267,7 +231,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - Inspired by [vim-lastplace](https://github.com/farmergreg/vim-lastplace)
-- Built with [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for testing
 - Thanks to the Neovim community for feedback and contributions
 
 ## 📚 See Also

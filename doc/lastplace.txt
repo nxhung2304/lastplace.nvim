@@ -37,7 +37,6 @@ Key Features:~
 • Optional cursor centering after jump
 • Fold opening support
 • Comprehensive user commands
-• Full test coverage
 • Detailed logging for troubleshooting
 
 ==============================================================================
@@ -391,34 +390,18 @@ LastPlace.nvim welcomes contributions! Here's how to get started:
 Development Setup:~
 1. Fork the repository
 2. Clone your fork locally
-3. Install development dependencies
-4. Run the test suite
-
-Testing:~
->bash
-    # Run all tests
-    make test
-    
-    # Run specific test file
-    nvim --headless -c "PlenaryBustedFile test/core_spec.lua"
-    
-    # Test coverage
-    make test-coverage
-<
+3. Install development dependencies<
 
 Code Style:~
 • Follow Lua formatting conventions
 • Use descriptive variable and function names  
 • Add comments for complex logic
-• Write tests for new features
 • Update documentation for API changes
 
 Submitting Changes:~
 1. Create a feature branch
-2. Write tests for your changes
-3. Ensure all tests pass
-4. Update documentation if needed
-5. Submit a pull request
+2. Update documentation if needed
+3. Submit a pull request
 
 Areas for Contribution:~
 • Additional configuration options
@@ -437,7 +420,6 @@ Version 1.0.0 (Initial Release):~
 • Optional cursor centering and fold opening
 • Comprehensive user commands
 • Full Lua API
-• Complete test coverage
 • Detailed documentation
 
 Future Versions:~

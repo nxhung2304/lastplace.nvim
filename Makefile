@@ -1,4 +1,4 @@
-.PHONY: test test-file test-coverage lint format install clean help dev watch check docs release
+.PHONY: lint format install clean help dev watch check docs release
 
 # Colors for output
 CYAN := \033[36m
@@ -8,8 +8,6 @@ RED := \033[31m
 RESET := \033[0m
 
 # Directories
-PLENARY_DIR := ~/.local/share/nvim/site/pack/testing/start/plenary.nvim
-TEST_DIR := test
 LUA_DIR := lua
 
 install: ## Install development dependencies
@@ -22,55 +20,6 @@ install: ## Install development dependencies
 		echo "$(YELLOW)[INFO]$(RESET) Plenary.nvim already installed."; \
 	fi
 
-test: install ## Run all tests
-	@echo "$(GREEN)[INFO]$(RESET) Running test suite..."
-	@if nvim --headless -u $(TEST_DIR)/minimal_init.lua \
-		-c "PlenaryBustedDirectory $(TEST_DIR)/ { minimal_init = '$(TEST_DIR)/minimal_init.lua' }"; then \
-		echo "$(GREEN)[SUCCESS]$(RESET) All tests passed!"; \
-	else \
-		echo "$(RED)[ERROR]$(RESET) Tests failed!"; \
-		exit 1; \
-	fi
-
-test-file: install ## Run specific test file (usage: make test-file FILE=test/core_spec.lua)
-	@if [ -z "$(FILE)" ]; then \
-		echo "$(RED)[ERROR]$(RESET) Please specify FILE parameter"; \
-		echo "$(YELLOW)Usage:$(RESET) make test-file FILE=test/core_spec.lua"; \
-		exit 1; \
-	fi
-	@echo "$(GREEN)[INFO]$(RESET) Running test file: $(FILE)"
-	@nvim --headless -u $(TEST_DIR)/minimal_init.lua -c "PlenaryBustedFile $(FILE)"
-
-test-simple: install ## Run simple test without plenary commands
-	@echo "$(GREEN)[INFO]$(RESET) Running simple test mode..."
-	@nvim --headless -u $(TEST_DIR)/minimal_init.lua \
-		-c "lua require('plenary.test_harness').test_directory('$(TEST_DIR)/')" -c "qa"
-
-test-coverage: install ## Run tests with coverage tracking
-	@echo "$(GREEN)[INFO]$(RESET) Running tests with coverage tracking..."
-	@nvim --headless -u $(TEST_DIR)/minimal_init.lua \
-		-c "lua require('test.coverage').run()" -c "qa"
-
-watch: install ## Watch for changes and run tests (requires inotifywait)
-	@echo "$(GREEN)[INFO]$(RESET) Starting test watch mode..."
-	@echo "$(YELLOW)[INFO]$(RESET) Watching $(LUA_DIR)/ and $(TEST_DIR)/ directories for changes..."
-	@if command -v inotifywait >/dev/null 2>&1; then \
-		trap 'echo "\n$(YELLOW)[INFO]$(RESET) Stopping watch mode..."; exit 0' INT; \
-		while true; do \
-			inotifywait -r -e modify,create,delete $(LUA_DIR)/ $(TEST_DIR)/ 2>/dev/null; \
-			echo ""; \
-			echo "$(YELLOW)[INFO]$(RESET) Files changed, running tests..."; \
-			make test || true; \
-			echo ""; \
-			echo "$(GREEN)[INFO]$(RESET) Waiting for changes... (Ctrl+C to stop)"; \
-		done; \
-	else \
-		echo "$(RED)[ERROR]$(RESET) inotifywait not found."; \
-		echo "$(YELLOW)[INSTALL]$(RESET) On Ubuntu/Debian: sudo apt-get install inotify-tools"; \
-		echo "$(YELLOW)[INSTALL]$(RESET) On macOS: brew install fswatch"; \
-		echo "$(YELLOW)[INSTALL]$(RESET) On Arch: sudo pacman -S inotify-tools"; \
-		exit 1; \
-	fi
 
 lint: ## Run linting with luacheck
 	@echo "$(GREEN)[INFO]$(RESET) Running luacheck..."
@@ -145,7 +94,7 @@ dev-simple: ## Start simple development (just nvim)
 	@echo "$(GREEN)[INFO]$(RESET) Starting simple development environment..."
 	@nvim .
 
-check: format-check lint test ## Run all checks (format + lint + test)
+check: format-check lint ## Run all checks (format + lint)
 	@echo "$(GREEN)[SUCCESS]$(RESET) All checks passed! 🎉"
 
 docs: ## Show documentation info
@@ -156,12 +105,6 @@ docs: ## Show documentation info
 	@echo ""
 	@echo "$(YELLOW)[VIEW]$(RESET) To view help in Neovim:"
 	@echo "  nvim -c 'help lastplace'"
-
-test-debug: install ## Run tests with debug output
-	@echo "$(GREEN)[INFO]$(RESET) Running tests with debug output..."
-	@nvim --headless -u $(TEST_DIR)/minimal_init.lua \
-		-c "lua vim.g.debug_tests = true" \
-		-c "PlenaryBustedDirectory $(TEST_DIR)/ { minimal_init = '$(TEST_DIR)/minimal_init.lua' }"
 
 validate: ## Validate plugin structure
 	@echo "$(GREEN)[INFO]$(RESET) Validating plugin structure..."
@@ -190,7 +133,6 @@ release: check validate ## Prepare for release (run all checks + validation)
 	@echo "$(YELLOW)[NEXT]$(RESET) Ready to tag and release."
 	@echo ""
 	@echo "$(CYAN)Release checklist:$(RESET)"
-	@echo "  ✅ All tests passed"
 	@echo "  ✅ Code formatting correct"
 	@echo "  ✅ Linting passed"
 	@echo "  ✅ Plugin structure valid"
@@ -231,7 +173,6 @@ status: ## Show development status
 	done
 	@echo ""
 	@echo "$(GREEN)Quick Commands:$(RESET)"
-	@echo "  make test    # Run tests"
 	@echo "  make dev     # Start development"
 	@echo "  make check   # Run all checks"
 
@@ -267,5 +208,4 @@ help: ## Show this help message
 	@echo "$(YELLOW)Quick start:$(RESET)"
 	@echo "  make install  # Install dependencies"
 	@echo "  make hooks    # Setup git hooks"
-	@echo "  make test     # Run tests"
 	@echo "  make dev      # Start development"

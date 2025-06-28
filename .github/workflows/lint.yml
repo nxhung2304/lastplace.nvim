@@ -1,0 +1,33 @@
+name: Lint
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Install stylua
+        run: |
+          STYLUA_VERSION=$(curl -s https://api.github.com/repos/JohnnyMorganz/StyLua/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+          curl -L "https://github.com/JohnnyMorganz/StyLua/releases/download/${STYLUA_VERSION}/stylua-linux-x86_64.zip" -o stylua.zip
+          unzip stylua.zip
+          chmod +x stylua
+          sudo mv stylua /usr/local/bin/
+          
+      - name: Check formatting
+        run: stylua --check lua/ test/
+        
+      - name: Install luacheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install luarocks
+          sudo luarocks install luacheck
+          
+      - name: Run luacheck
+        run: luacheck lua/
