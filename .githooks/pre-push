@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Git pre-push hook for lastplace.nvim
+# Runs comprehensive checks before pushing
+
+set -e
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+echo -e "${CYAN}🚀 Running pre-push checks...${NC}"
+
+# Check if we have any commits to push
+if git diff --quiet HEAD @{u} 2>/dev/null; then
+    echo -e "${YELLOW}ℹ️  No new commits to push${NC}"
+    exit 0
+fi
+
+# Run comprehensive checks
+echo -e "${YELLOW}📋 Running full test suite...${NC}"
+
+if make check >/dev/null 2>&1; then
+    echo -e "${GREEN}✅ All pre-push checks passed!${NC}"
+    echo -e "${CYAN}🚀 Ready to push${NC}"
+else
+    echo -e "${RED}🚫 Pre-push checks failed${NC}"
+    echo -e "${YELLOW}💡 Run 'make check' to see detailed errors${NC}"
+    exit 1
+fi

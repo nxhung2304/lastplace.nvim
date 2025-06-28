@@ -12,17 +12,6 @@ PLENARY_DIR := ~/.local/share/nvim/site/pack/testing/start/plenary.nvim
 TEST_DIR := test
 LUA_DIR := lua
 
-# Default target
-help: ## Show this help message
-	@echo "$(CYAN)LastPlace.nvim Development Commands:$(RESET)"
-	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-15s$(RESET) %s\n", $$1, $$2}'
-	@echo ""
-	@echo "$(YELLOW)Quick start:$(RESET)"
-	@echo "  make install  # Install dependencies"
-	@echo "  make test     # Run tests"
-	@echo "  make dev      # Start development"
-
 install: ## Install development dependencies
 	@echo "$(GREEN)[INFO]$(RESET) Installing plenary.nvim..."
 	@mkdir -p ~/.local/share/nvim/site/pack/testing/start/
@@ -245,3 +234,38 @@ status: ## Show development status
 	@echo "  make test    # Run tests"
 	@echo "  make dev     # Start development"
 	@echo "  make check   # Run all checks"
+
+hooks: ## Setup git hooks for code quality
+	@echo "$(GREEN)[INFO]$(RESET) Setting up git hooks..."
+	@if [ ! -d ".git" ]; then \
+		echo "$(RED)[ERROR]$(RESET) Not in a git repository"; \
+		exit 1; \
+	fi
+	@chmod +x scripts/setup-hooks.sh
+	@./scripts/setup-hooks.sh
+	@echo "$(GREEN)[SUCCESS]$(RESET) Git hooks installed!"
+
+hooks-test: ## Test git hooks manually
+	@echo "$(GREEN)[INFO]$(RESET) Testing git hooks..."
+	@if [ -f ".git/hooks/pre-commit" ]; then \
+		echo "$(YELLOW)[INFO]$(RESET) Testing pre-commit hook..."; \
+		./.git/hooks/pre-commit; \
+	else \
+		echo "$(RED)[ERROR]$(RESET) Pre-commit hook not found. Run: make hooks"; \
+	fi
+
+hooks-remove: ## Remove git hooks
+	@echo "$(GREEN)[INFO]$(RESET) Removing git hooks..."
+	@rm -f .git/hooks/pre-commit .git/hooks/pre-push .git/hooks/commit-msg
+	@echo "$(GREEN)[SUCCESS]$(RESET) Git hooks removed!"
+
+help: ## Show this help message
+	@echo "$(CYAN)LastPlace.nvim Development Commands:$(RESET)"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-15s$(RESET) %s\n", $$1, $$2}'
+	@echo ""
+	@echo "$(YELLOW)Quick start:$(RESET)"
+	@echo "  make install  # Install dependencies"
+	@echo "  make hooks    # Setup git hooks"
+	@echo "  make test     # Run tests"
+	@echo "  make dev      # Start development"

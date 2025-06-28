@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# Git pre-commit hook for lastplace.nvim
+# Runs code quality checks before allowing commit
+
+set -e
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+echo -e "${CYAN}🔍 Running pre-commit checks...${NC}"
+
+# Check if we're in the right directory
+if [ ! -f "Makefile" ] || [ ! -d "lua/lastplace" ]; then
+    echo -e "${RED}❌ Error: Not in lastplace.nvim root directory${NC}"
+    exit 1
+fi
+
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to get staged Lua files
+get_staged_lua_files() {
+    git diff --cached --name-only --diff-filter=ACM | grep '\.lua$' || true
+}
+
+# Function to run check with retry
+run_check() {
+    local check_name="$1"
+    local command="$2"
+    local can_autofix="$3"
+    
+    echo -e "${YELLOW}📋 Running $check_name...${NC}"
+    
+    if eval "$command"; then
+        echo -e "${GREEN}✅ $check_name passed${NC}"
+        return 0
+    else
+        echo -e "${RED}❌ $check_name failed${NC}"
+        
+        if [ "$can_autofix" = "true" ]; then
+            echo -e "${YELLOW}🔧 Attempting to auto-fix...${NC}"
+            return 1
+        else
+            return 1
+        fi
+    fi
+}
+
+# Get staged Lua files
+STAGED_LUA_FILES=$(get_staged_lua_files)
+
+if [ -z "$STAGED_LUA_FILES" ]; then
+    echo -e "${YELLOW}ℹ️  No Lua files staged for commit${NC}"
+    exit 0
+fi
+
+echo -e "${CYAN}📁 Checking staged Lua files:${NC}"
+echo "$STAGED_LUA_FILES" | sed 's/^/  - /'
+
+# Track if any checks failed
+CHECKS_FAILED=0
+
+# 1. Code Formatting Check
+if command_exists stylua; then
+    if ! run_check "Code Formatting" "echo '$STAGED_LUA_FILES' | xargs stylua --check" "true"; then
+        echo -e "${YELLOW}🔧 Auto-fixing formatting issues...${NC}"
+        echo "$STAGED_LUA_FILES" | xargs stylua
+        
+        # Re-stage the formatted files
+        echo "$STAGED_LUA_FILES" | xargs git add
+        echo -e "${GREEN}✅ Formatting fixed and files re-staged${NC}"
+    fi
+else
+    echo -e "${YELLOW}⚠️  stylua not found, skipping format check${NC}"
+fi
+
+# 2. Linting Check  
+if command_exists luacheck; then
+    if ! run_check "Linting" "echo '$STAGED_LUA_FILES' | xargs luacheck" "false"; then
+        echo -e "${RED}💡 Fix linting issues before committing${NC}"
+        echo -e "${YELLOW}   Run: make lint-fix${NC}"
+        CHECKS_FAILED=1
+    fi
+else
+    echo -e "${YELLOW}⚠️  luacheck not found, skipping lint check${NC}"
+fi
+
+# 3. Basic Tests (if test files exist)
+if [ -d "test" ] && [ -n "$(find test -name '*_spec.lua' 2>/dev/null)" ]; then
+    if command_exists nvim; then
+        if ! run_check "Tests" "make test-simple >/dev/null 2>&1" "false"; then
+            echo -e "${RED}💡 Fix failing tests before committing${NC}"
+            echo -e "${YELLOW}   Run: make test${NC}"
+            CHECKS_FAILED=1
+        fi
+    else
+        echo -e "${YELLOW}⚠️  Neovim not found, skipping tests${NC}"
+    fi
+else
+    echo -e "${YELLOW}ℹ️  No test files found, skipping tests${NC}"
+fi
+
+# 4. Plugin Structure Validation
+if ! run_check "Plugin Structure" "make validate >/dev/null 2>&1" "false"; then
+    echo -e "${RED}💡 Fix plugin structure issues${NC}"
+    echo -e "${YELLOW}   Run: make validate${NC}"
+    CHECKS_FAILED=1
+fi
+
+# Final result
+echo ""
+if [ $CHECKS_FAILED -eq 0 ]; then
+    echo -e "${GREEN}🎉 All pre-commit checks passed!${NC}"
+    echo -e "${CYAN}✨ Ready to commit${NC}"
+    exit 0
+else
+    echo -e "${RED}🚫 Pre-commit checks failed${NC}"
+    echo -e "${YELLOW}💡 Fix the issues above and try again${NC}"
+    echo ""
+    echo -e "${CYAN}Quick fixes:${NC}"
+    echo -e "  make format     ${YELLOW}# Fix formatting${NC}"
+    echo -e "  make lint-fix   ${YELLOW}# Fix some lint issues${NC}"
+    echo -e "  make test       ${YELLOW}# Run tests${NC}"
+    echo -e "  make check      ${YELLOW}# Run all checks${NC}"
+    exit 1
+fi

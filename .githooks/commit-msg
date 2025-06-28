@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Git commit-msg hook for lastplace.nvim
+# Validates commit message format
+
+set -e
+
+# Read the commit message
+commit_msg=$(cat "$1")
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# Skip validation for merge commits
+if echo "$commit_msg" | grep -q "^Merge "; then
+    exit 0
+fi
+
+# Check conventional commit format
+# feat: add new feature
+# fix: fix bug
+# docs: update documentation
+# test: add tests
+# refactor: refactor code
+# style: format code
+# chore: maintenance
+
+conventional_regex="^(feat|fix|docs|test|refactor|style|chore|ci|perf|build)(\(.+\))?: .{1,50}"
+
+if echo "$commit_msg" | grep -qE "$conventional_regex"; then
+    echo -e "${GREEN}✅ Commit message format is valid${NC}"
+else
+    echo -e "${RED}❌ Invalid commit message format${NC}"
+    echo ""
+    echo -e "${YELLOW}Expected format:${NC}"
+    echo "  type(scope): description"
+    echo ""
+    echo -e "${YELLOW}Valid types:${NC}"
+    echo "  feat:     New feature"
+    echo "  fix:      Bug fix"
+    echo "  docs:     Documentation"
+    echo "  test:     Tests"
+    echo "  refactor: Code refactoring"
+    echo "  style:    Code formatting"
+    echo "  chore:    Maintenance"
+    echo ""
+    echo -e "${YELLOW}Examples:${NC}"
+    echo "  feat: add cursor centering option"
+    echo "  fix: handle invalid cursor position"
+    echo "  docs: update configuration examples"
+    echo "  test(core): add jump functionality tests"
+    echo ""
+    exit 1
+fi
