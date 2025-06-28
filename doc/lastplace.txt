@@ -1,0 +1,35 @@
+*lastplace.txt*          Jump to last cursor position           *lastplace*
+
+INTRODUCTION                                    *lastplace-introduction*
+
+LastPlace automatically restores cursor position when reopening files.
+
+SETUP                                          *lastplace-setup*
+
+Basic setup: >
+    require("lastplace").setup()
+<
+
+With custom options: >
+    require("lastplace").setup({
+      ignore_filetypes = { "gitcommit", "gitrebase" },
+      center_on_jump = true,
+      min_lines = 5,
+    })
+<
+
+CONFIGURATION                                  *lastplace-configuration*
+
+ignore_filetypes        List of filetypes to ignore
+ignore_buftypes         List of buffer types to ignore  
+center_on_jump          Center cursor after jumping (default: true)
+jump_only_if_not_visible Only jump if line not visible (default: false)
+min_lines               Minimum lines required (default: 10)
+max_line                Maximum line to jump to (default: 0 = no limit)
+open_folds              Open folds after jump (default: true)
+debug                   Enable debug messages (default: false)
+
+COMMANDS                                       *lastplace-commands*
+
+:LastPlaceJump          Manually jump to last position
+:LastPlaceToggle        Toggle centering feature
