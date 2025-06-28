@@ -18,10 +18,11 @@
 ```lua
 {
   "nxhung2304/lastplace.nvim",
+  event = {
+    "BufReadPost"
+  },
   config = function()
-    require("lastplace").setup({
-      -- Config here
-    })
+    require("lastplace").setup()
   end,
 }
 ```
