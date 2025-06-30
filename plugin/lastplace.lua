@@ -1,11 +1,8 @@
--- Auto-initialization if user doesn't call setup()
 if vim.g.loaded_lastplace then
   return
 end
+vim.g.loaded_lastplace = true
 
-vim.g.loaded_lastplace = 1
-
--- Auto-setup with defaults if no manual setup
 vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()

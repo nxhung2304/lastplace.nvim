@@ -8,9 +8,9 @@ globals = {
   "assert",
 }
 
-read_globals = {
-  "vim",
-}
+-- read_globals = {
+--   "vim",
+-- }
 
 exclude_files = {
   "test/minimal_init.lua",
