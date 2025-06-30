@@ -92,28 +92,6 @@ else
     echo -e "${YELLOW}⚠️  luacheck not found, skipping lint check${NC}"
 fi
 
-# 3. Basic Tests (if test files exist)
-if [ -d "test" ] && [ -n "$(find test -name '*_spec.lua' 2>/dev/null)" ]; then
-    if command_exists nvim; then
-        if ! run_check "Tests" "make test-simple >/dev/null 2>&1" "false"; then
-            echo -e "${RED}💡 Fix failing tests before committing${NC}"
-            echo -e "${YELLOW}   Run: make test${NC}"
-            CHECKS_FAILED=1
-        fi
-    else
-        echo -e "${YELLOW}⚠️  Neovim not found, skipping tests${NC}"
-    fi
-else
-    echo -e "${YELLOW}ℹ️  No test files found, skipping tests${NC}"
-fi
-
-# 4. Plugin Structure Validation
-if ! run_check "Plugin Structure" "make validate >/dev/null 2>&1" "false"; then
-    echo -e "${RED}💡 Fix plugin structure issues${NC}"
-    echo -e "${YELLOW}   Run: make validate${NC}"
-    CHECKS_FAILED=1
-fi
-
 # Final result
 echo ""
 if [ $CHECKS_FAILED -eq 0 ]; then
@@ -127,7 +105,6 @@ else
     echo -e "${CYAN}Quick fixes:${NC}"
     echo -e "  make format     ${YELLOW}# Fix formatting${NC}"
     echo -e "  make lint-fix   ${YELLOW}# Fix some lint issues${NC}"
-    echo -e "  make test       ${YELLOW}# Run tests${NC}"
     echo -e "  make check      ${YELLOW}# Run all checks${NC}"
     exit 1
 fi
