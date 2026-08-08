@@ -185,25 +185,29 @@ to `vim.notify()` with DEBUG level.
 ==============================================================================
 4. COMMANDS                                            *lastplace-commands*
 
-LastPlace provides several user commands for manual control:
+LastPlace provides a single scoped command for manual control. All actions
+are subcommands of `:LastPlace`, with tab-completion for each. Called with no
+argument, `:LastPlace` defaults to `jump`.
 
-                                                        *:LastPlaceJump*
-:LastPlaceJump          Manually jump to the last cursor position in the
-                        current buffer. Shows a notification with the result.
+                                                        *:LastPlace*
+:LastPlace [subcommand] Run a LastPlace action. Available subcommands:
 
-                                                        *:LastPlaceToggle*
-:LastPlaceToggle        Toggle the `center_on_jump` setting. Useful for
-                        temporarily disabling cursor centering.
+                        jump    Manually jump to the last cursor position in
+                                the current buffer (this is the default when
+                                no subcommand is given). Shows a notification
+                                with the result.
 
-                                                        *:LastPlaceInfo*
-:LastPlaceInfo          Display current plugin status and configuration.
-                        Shows whether the current buffer would be ignored,
-                        current settings, and other diagnostic information.
+                        toggle  Toggle the `center_on_jump` setting. Useful
+                                for temporarily disabling cursor centering.
 
-                                                        *:LastPlaceReset*
-:LastPlaceReset         Reset all configuration options to their default
-                        values. Useful for troubleshooting configuration
-                        issues.
+                        info    Display current plugin status and
+                                configuration. Shows whether the current
+                                buffer would be ignored, current settings,
+                                and other diagnostic information.
+
+                        reset   Reset all configuration options to their
+                                default values. Useful for troubleshooting
+                                configuration issues.
 
 ==============================================================================
 5. API                                                      *lastplace-api*
@@ -348,16 +352,16 @@ Position not restored for specific files:~
 1. Check if the filetype is in `ignore_filetypes`
 2. Check if the buffer type is in `ignore_buftypes`  
 3. Verify the file has enough lines (see `min_lines`)
-4. Use `:LastPlaceInfo` to see current status
+4. Use `:LastPlace info` to see current status
 
 Cursor not centering:~
 1. Check `center_on_jump` setting
-2. Use `:LastPlaceToggle` to enable centering
+2. Use `:LastPlace toggle` to enable centering
 3. Verify the file is long enough for centering to be visible
 
 Debug Commands:~
 >vim
-    :LastPlaceInfo         " Check current status
+    :LastPlace info        " Check current status
     :set filetype?         " Check current filetype
     :set buftype?          " Check current buffer type
     :echo line("'\"")      " Check last position mark
