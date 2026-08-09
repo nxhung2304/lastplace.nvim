@@ -1,7 +1,9 @@
+---@class lastplace.Core
 local M = {}
 
 local config = require("lastplace.config")
 
+---@param msg string
 local function debug_log(msg)
   local cfg = config.get()
   if cfg.debug then
@@ -9,6 +11,8 @@ local function debug_log(msg)
   end
 end
 
+---@param filetype string
+---@return boolean should_ignore
 local function should_ignore_filetype(filetype)
   local cfg = config.get()
   for _, ft in ipairs(cfg.ignore_filetypes) do
@@ -19,6 +23,8 @@ local function should_ignore_filetype(filetype)
   return false
 end
 
+---@param buftype string
+---@return boolean should_ignore
 local function should_ignore_buftype(buftype)
   local cfg = config.get()
   for _, bt in ipairs(cfg.ignore_buftypes) do
@@ -29,12 +35,15 @@ local function should_ignore_buftype(buftype)
   return false
 end
 
+---@param line_num integer
+---@return boolean is_visible
 local function is_line_visible(line_num)
-  local win_top = vim.fn.line("w0")
-  local win_bottom = vim.fn.line("w$")
+  local win_top = vim.fn.line("w0") ---@type integer
+  local win_bottom = vim.fn.line("w$") ---@type integer
   return line_num >= win_top and line_num <= win_bottom
 end
 
+---@return boolean is_ignored
 function M.is_buffer_ignored()
   local filetype = vim.bo.filetype
   local buftype = vim.bo.buftype
@@ -42,6 +51,7 @@ function M.is_buffer_ignored()
   return should_ignore_filetype(filetype) or should_ignore_buftype(buftype)
 end
 
+---@return boolean jumped
 function M.jump_to_last_place()
   local cfg = config.get()
 
@@ -54,8 +64,7 @@ function M.jump_to_last_place()
   local bufname = vim.fn.expand("%")
 
   debug_log(
-    string.format(
-      "Buffer: %s, FileType: %s, BufType: %s, LastPos: %d:%d, Total: %d",
+    ("Buffer: %s, FileType: %s, BufType: %s, LastPos: %d:%d, Total: %d"):format(
       bufname,
       filetype,
       buftype,
@@ -96,7 +105,7 @@ function M.jump_to_last_place()
   end
 
   vim.api.nvim_win_set_cursor(0, { last_line, math.max(0, last_col - 1) })
-  debug_log(string.format("Jumped to position %d:%d", last_line, last_col))
+  debug_log(("Jumped to position %d:%d"):format(last_line, last_col))
 
   if cfg.open_folds then
     vim.cmd("normal! zv")
