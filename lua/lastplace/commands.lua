@@ -1,10 +1,9 @@
 ---@class lastplace.Commands
 local M = {}
 
-local config = require("lastplace.config")
-local core = require("lastplace.core")
-
 function M.setup()
+  local config = require("lastplace.config")
+  local core = require("lastplace.core")
   vim.api.nvim_create_user_command("LastPlaceJump", function()
     local success = core.jump_to_last_place()
     if success then

@@ -1,10 +1,10 @@
 ---@class lastplace.Utils.FileStats
----@field total_lines integer
----@field current_line integer
----@field current_col integer
----@field last_position [integer, integer]
----@field filetype string
 ---@field buftype string
+---@field current_col integer
+---@field current_line integer
+---@field filetype string
+---@field last_position [integer, integer]
+---@field total_lines integer
 
 ---@class lastplace.Utils
 local M = {}
