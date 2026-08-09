@@ -89,12 +89,15 @@ require("lastplace").setup({
 
 ## 🔧 Commands
 
+All actions live under a single `:LastPlace` command with tab-completion.
+Called with no argument it defaults to `jump`.
+
 | Command | Description |
 |---------|-------------|
-| `:LastPlaceJump` | Manually jump to last cursor position |
-| `:LastPlaceToggle` | Toggle cursor centering feature |
-| `:LastPlaceInfo` | Show current plugin status and config |
-| `:LastPlaceReset` | Reset configuration to defaults |
+| `:LastPlace jump` | Manually jump to last cursor position (default) |
+| `:LastPlace toggle` | Toggle cursor centering feature |
+| `:LastPlace info` | Show current plugin status and config |
+| `:LastPlace reset` | Reset configuration to defaults |
 
 ## 📋 API
 
