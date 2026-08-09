@@ -122,11 +122,19 @@ end
 function M.setup()
   local group = vim.api.nvim_create_augroup("LastPlace", { clear = true })
 
-  vim.api.nvim_create_autocmd("BufReadPost", {
+  vim.api.nvim_create_autocmd("BufReadPre", {
     group = group,
-    desc = "Jump to last cursor position",
+    desc = "Schedule last-position jump once filetype is set",
     pattern = "*",
-    callback = M.jump_to_last_place,
+    callback = function(args)
+      vim.api.nvim_create_autocmd("FileType", {
+        group = group,
+        buffer = args.buf,
+        once = true,
+        desc = "Jump to last cursor position",
+        callback = M.jump_to_last_place,
+      })
+    end,
   })
 end
 
