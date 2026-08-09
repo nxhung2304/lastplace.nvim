@@ -42,6 +42,10 @@ function subcommands.reset()
   vim.notify("LastPlace configuration reset to defaults")
 end
 
+-- Ordered list of subcommand names (single source of truth for dispatch,
+-- completion, and error messages).
+local names = { "jump", "toggle", "info", "reset" }
+
 function M.setup()
   vim.api.nvim_create_user_command("LastPlace", function(opts)
     local name = opts.fargs[1] or "jump"
@@ -49,7 +53,7 @@ function M.setup()
 
     if not handler then
       vim.notify(
-        "LastPlace: unknown subcommand '" .. name .. "'. Available: jump, toggle, info, reset",
+        "LastPlace: unknown subcommand '" .. name .. "'. Available: " .. table.concat(names, ", "),
         vim.log.levels.ERROR
       )
       return
@@ -62,7 +66,6 @@ function M.setup()
     ---@param arg_lead string
     ---@return string[]
     complete = function(arg_lead)
-      local names = { "jump", "toggle", "info", "reset" }
       return vim.tbl_filter(function(name)
         return name:find(arg_lead, 1, true) == 1
       end, names)
