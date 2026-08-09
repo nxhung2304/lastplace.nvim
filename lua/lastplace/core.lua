@@ -55,6 +55,13 @@ end
 function M.jump_to_last_place()
   local cfg = config.get()
 
+  -- Yield to session managers (auto-session, persistence.nvim, :mksession) while a
+  -- session is being sourced; Vim sets vim.g.SessionLoad during that time.
+  if vim.g.SessionLoad == 1 then
+    debug_log("Session loading in progress, skipping jump")
+    return false
+  end
+
   local last_line = vim.fn.line("'\"")
   local last_col = vim.fn.col("'\"")
 
