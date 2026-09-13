@@ -1,2 +1,5 @@
 # Vim helpdoc tags
 /doc/tags
+
+# Test dependencies (fetched by `make test`)
+/.deps/

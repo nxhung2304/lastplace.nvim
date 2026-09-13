@@ -1,4 +1,4 @@
-.PHONY: lint lint-fix format clean help hooks hooks-remove
+.PHONY: lint lint-fix format clean help hooks hooks-remove test test-deps
 
 # Colors for output
 CYAN := \033[36m
@@ -9,6 +9,8 @@ RESET := \033[0m
 
 # Directories
 LUA_DIR := lua
+TEST_DIR := test
+DEPS_DIR := .deps/site/pack/deps/start
 
 lint: ## Run linting with luacheck
 	@echo "$(GREEN)[INFO]$(RESET) Running luacheck..."
@@ -44,6 +46,18 @@ format: ## Format code with stylua
 		echo "$(YELLOW)[WARN]$(RESET) stylua not found."; \
 		echo "$(YELLOW)[INSTALL]$(RESET) Install from: https://github.com/JohnnyMorganz/StyLua"; \
 	fi
+
+test-deps: ## Clone test dependencies (plenary.nvim) if missing
+	@if [ ! -d "$(DEPS_DIR)/plenary.nvim" ]; then \
+		echo "$(GREEN)[INFO]$(RESET) Fetching plenary.nvim for tests..."; \
+		mkdir -p $(DEPS_DIR); \
+		git clone --depth 1 https://github.com/nvim-lua/plenary.nvim $(DEPS_DIR)/plenary.nvim; \
+	fi
+
+test: test-deps ## Run the test suite with plenary.nvim
+	@echo "$(GREEN)[INFO]$(RESET) Running tests..."
+	@nvim --headless -u $(TEST_DIR)/minimal_init.lua \
+		-c "PlenaryBustedDirectory $(TEST_DIR)/lastplace/ {minimal_init = '$(TEST_DIR)/minimal_init.lua'}"
 
 hooks: ## Setup git hooks for code quality
 	@echo "$(GREEN)[INFO]$(RESET) Setting up git hooks..."
