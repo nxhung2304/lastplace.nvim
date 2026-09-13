@@ -12,6 +12,7 @@
 - **Manual Control** - Commands for manual jumping and configuration
 
 ## 📦 Installation
+> Requires Neovim >= 0.7 (no external dependencies).
 
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
