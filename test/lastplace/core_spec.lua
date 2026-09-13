@@ -34,17 +34,22 @@ describe("lastplace.core", function()
   end)
 
   it("jumps to the last position on a normal file", function()
-    make_buffer(20, 12, 3)
+    local total_lines = 20
+    local last_line = 12
+    local last_col = 3
+    make_buffer(total_lines, last_line, last_col)
 
     local jumped = core.jump_to_last_place()
 
     assert.is_true(jumped)
-    assert.same({ 12, 2 }, vim.api.nvim_win_get_cursor(0))
+    assert.same({ last_line, last_col - 1 }, vim.api.nvim_win_get_cursor(0))
   end)
 
   it("skips files shorter than min_lines", function()
-    config.setup({ min_lines = 10 })
-    make_buffer(5, 3, 1)
+    local min_lines = 10
+    local total_lines = min_lines - 1
+    config.setup({ min_lines = min_lines })
+    make_buffer(total_lines, 3, 1)
 
     local jumped = core.jump_to_last_place()
 
@@ -53,8 +58,9 @@ describe("lastplace.core", function()
   end)
 
   it("skips when the mark points past the end of the file", function()
-    make_buffer(20, 12, 1)
-    vim.fn.setpos("'\"", { 0, 999, 1, 0 })
+    local total_lines = 20
+    make_buffer(total_lines, 12, 1)
+    vim.fn.setpos("'\"", { 0, total_lines + 1, 1, 0 })
 
     local jumped = core.jump_to_last_place()
 
@@ -62,7 +68,8 @@ describe("lastplace.core", function()
   end)
 
   it("skips an empty file", function()
-    make_buffer(1)
+    local empty_file_lines = 1
+    make_buffer(empty_file_lines)
 
     local jumped = core.jump_to_last_place()
 
@@ -88,8 +95,10 @@ describe("lastplace.core", function()
   end)
 
   it("skips when last_line exceeds max_line", function()
-    config.setup({ max_line = 5 })
-    make_buffer(20, 12, 1)
+    local max_line = 5
+    local last_line = max_line + 1
+    config.setup({ max_line = max_line })
+    make_buffer(20, last_line, 1)
 
     local jumped = core.jump_to_last_place()
 
@@ -97,9 +106,11 @@ describe("lastplace.core", function()
   end)
 
   it("does not jump when jump_only_if_not_visible and the line is already visible", function()
+    local window_height = 10
+    local visible_line = 5
     config.setup({ jump_only_if_not_visible = true })
-    make_buffer(100, 5, 1)
-    vim.api.nvim_win_set_height(0, 10)
+    make_buffer(100, visible_line, 1)
+    vim.api.nvim_win_set_height(0, window_height)
     vim.api.nvim_win_set_cursor(0, { 1, 0 })
     vim.cmd("normal! zt")
 
@@ -109,30 +120,35 @@ describe("lastplace.core", function()
   end)
 
   it("jumps when jump_only_if_not_visible and the line is not visible", function()
+    local window_height = 10
+    local hidden_line = 90
     config.setup({ jump_only_if_not_visible = true })
-    make_buffer(100, 90, 1)
-    vim.api.nvim_win_set_height(0, 10)
+    make_buffer(100, hidden_line, 1)
+    vim.api.nvim_win_set_height(0, window_height)
     vim.api.nvim_win_set_cursor(0, { 1, 0 })
     vim.cmd("normal! zt")
 
     local jumped = core.jump_to_last_place()
 
     assert.is_true(jumped)
-    assert.equals(90, vim.api.nvim_win_get_cursor(0)[1])
+    assert.equals(hidden_line, vim.api.nvim_win_get_cursor(0)[1])
   end)
 
   it("opens a closed fold covering the last position when open_folds is true", function()
+    local fold_start = 5
+    local fold_end = 15
+    local last_line = 10
     config.setup({ open_folds = true })
-    make_buffer(30, 10, 1)
+    make_buffer(30, last_line, 1)
     vim.wo.foldenable = true
     vim.wo.foldmethod = "manual"
-    vim.cmd("5,15fold")
-    assert.equals(5, vim.fn.foldclosed(10))
+    vim.cmd(("%d,%dfold"):format(fold_start, fold_end))
+    assert.equals(fold_start, vim.fn.foldclosed(last_line))
 
     local jumped = core.jump_to_last_place()
 
     assert.is_true(jumped)
-    assert.equals(-1, vim.fn.foldclosed(10))
+    assert.equals(-1, vim.fn.foldclosed(last_line))
   end)
 
   it("skips the jump while a session is being loaded", function()

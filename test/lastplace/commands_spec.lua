@@ -22,13 +22,17 @@ describe("lastplace.commands", function()
   end)
 
   it(":LastPlace jump moves the cursor to the last position", function()
+    local total_lines = 20
+    local last_line = 12
+    local last_col = 3
+
     local bufnr = vim.api.nvim_create_buf(true, false)
     vim.api.nvim_win_set_buf(0, bufnr)
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, make_lines(20))
-    vim.fn.setpos("'\"", { bufnr, 12, 3, 0 })
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, make_lines(total_lines))
+    vim.fn.setpos("'\"", { bufnr, last_line, last_col, 0 })
 
     vim.cmd("LastPlace jump")
 
-    assert.same({ 12, 2 }, vim.api.nvim_win_get_cursor(0))
+    assert.same({ last_line, last_col - 1 }, vim.api.nvim_win_get_cursor(0))
   end)
 end)
