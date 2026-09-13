@@ -2,7 +2,7 @@
 
                     LASTPLACE.NVIM DOCUMENTATION
 
-Author: Your Name <your.email@example.com>
+Author: Nguyen Xuan Hung <mongtamquoc2015@gmail.com>
 License: MIT
 Version: 1.0.0
 
@@ -418,19 +418,16 @@ Areas for Contribution:~
 ==============================================================================
 9. CHANGELOG                                          *lastplace-changelog*
 
-Version 1.0.0 (Initial Release):~
+Version 1.0.0:~
 • Core cursor position restoration functionality
 • Configurable filetype and buffer type filtering
 • Optional cursor centering and fold opening
-• Comprehensive user commands
+• Single `:LastPlace {subcommand}` command with tab-completion (#9)
 • Full Lua API
 • Detailed documentation
-
-Future Versions:~
-• Session integration
-• Advanced filtering options
-• Performance optimizations
-• Additional positioning strategies
+• Defer the last-place jump to a one-shot `FileType` autocmd for
+  reliable filetype/buftype ignoring on `BufRead` (#1)
+• Skip restoration while a session is being loaded (#5)
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:
